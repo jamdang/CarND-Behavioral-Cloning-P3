@@ -1,8 +1,6 @@
-#**Traffic Sign Recognition** 
+#**Behavioral Cloning** 
 
-##Writeup Template
-
-###You can use this file as a template for your writeup if you want to submit it as a markdown file, but feel free to use some other method and submit a pdf if you prefer.
+##Writeup Report
 
 ---
 
@@ -38,13 +36,14 @@ My project includes the following files:
 * model.py containing the script to create and train the model
 * drive.py for driving the car in autonomous mode
 * model.h5 containing a trained convolution neural network 
-* writeup_report.md or writeup_report.pdf summarizing the results
+* writeup_report.md summarizing the results
 
 ####2. Submssion includes functional code
 Using the Udacity provided simulator and my drive.py file, the car can be driven autonomously around the track by executing 
 ```sh
 python drive.py model.h5
 ```
+By using only training data collected around the first (left) track, the trained model eventually managed to drive the car around both tracks in the standard simulator (but failed to drive around the more challenging track in the beta simulator).
 
 ####3. Submssion code is usable and readable
 
@@ -54,25 +53,43 @@ The model.py file contains the code for training and saving the convolution neur
 
 ####1. An appropriate model arcthiecture has been employed
 
-My model consists of a convolution neural network with 3x3 filter sizes and depths between 32 and 128 (model.py lines 18-24) 
+A convolution neural network with depths between 24 and 64 is employed in this project.  
+The model includes RELU layers (for convolutional layers) and tanh (for fully-connected layers) to introduce nonlinearity.
+The network consists of a total of 13 layers (excluding the final output layer), including 5 convolutional layers, 3 pooling layers and 3 fully connected layers. 
 
-The model includes RELU layers to introduce nonlinearity (code line 20), and the data is normalized in the model using a Keras lambda layer (code line 18). 
+| Layer # | Layer Type   | parameter   |  activation |
+| ------------- |-------------| ------|------------------------|
+| 1      | cropping      | 50 rows from top, 20 from bottom | NA |
+| 2      | normalization|   [-1, 1] after normalization| NA |
+| 3      | convolutional      |    5×5 kernel, 24 filters | RELU |
+| 4      | maxpooling      |    2×2  | NA |
+| 5      | convolutional      |    5×5 kernel, 36 filters | RELU |
+| 6      | maxpooling      |    2×2  | NA |
+| 7      | convolutional      |    5×5 kernel, 48 filters | RELU |
+| 8      | maxpooling      |    2×2  | NA |
+| 9      | convolutional      |    3×3 kernel, 64 filters | RELU |
+| 10      | convolutional      |    3×3 kernel, 64 filters | RELU |
+| 11      | fully-connected      |  100 hidden units | tanh |
+| 12      | fully-connected      |  50 hidden units | tanh |
+| 13      | fully-connected      |  10 hidden units | tanh |
+
+The first layer is a cropping layer, which crops the not-so-important parts of the image (the sky and the hood of the car); 
+The second layer of the network performs image normalization. The normalizer is hard-coded and is not adjusted in the learning process, the data is normalized in the model using a Keras lambda layer; 
+The convolutional layers were designed to perform feature extraction, and the fully-connected layers are meant for regression that maps the high level features of the images to the steering angle command. 
+
 
 ####2. Attempts to reduce overfitting in the model
 
-The model contains dropout layers in order to reduce overfitting (model.py lines 21). 
-
-The model was trained and validated on different data sets to ensure that the model was not overfitting (code line 10-16). The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
+The model was trained and validated on different data sets to ensure that the model was not overfitting. With the current model, there is no overfitting issues (in fact the training loss almost always a little larger than the validation loss...) even without dropout layers or other regularization method. The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
 
 ####3. Model parameter tuning
 
-The model used an adam optimizer, so the learning rate was not tuned manually (model.py line 25).
+The model used an adam optimizer, so the learning rate was not tuned manually.
 
 ####4. Appropriate training data
 
-Training data was chosen to keep the vehicle driving on the road. I used a combination of center lane driving, recovering from the left and right sides of the road ... 
-
-For details about how I created the training data, see the next section. 
+Training data was chosen to keep the vehicle driving on the road. For the issue of recovering the car from being off-center, I used the multiple camera method, i.e., using all three sets of images from the left, the center and the right cameras, and "correcting" the steering angles corresponding to the left and the right images. 
+For details about how I created the training data, please see the next section. 
 
 ###Model Architecture and Training Strategy
 
