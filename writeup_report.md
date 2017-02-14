@@ -36,13 +36,14 @@ My project includes the following files:
 * model.py containing the script to create and train the model
 * drive.py for driving the car in autonomous mode
 * model.h5 containing a trained convolution neural network 
-* writeup_report.md or writeup_report.pdf summarizing the results
+* writeup_report.md summarizing the results
 
 ####2. Submssion includes functional code
 Using the Udacity provided simulator and my drive.py file, the car can be driven autonomously around the track by executing 
 ```sh
 python drive.py model.h5
 ```
+By using only training data collected around the first (left) track, the trained model managed to drive the car around both tracks in the standar simulator (but failed to drive around the more challenging track in the beta simulator).
 
 ####3. Submssion code is usable and readable
 
