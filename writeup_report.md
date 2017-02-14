@@ -80,11 +80,11 @@ The convolutional layers were designed to perform feature extraction, and the fu
 
 ####2. Attempts to reduce overfitting in the model
 
-The model was trained and validated on different data sets to ensure that the model was not overfitting. With the current model, there is no overfitting issues (in fact the training loss almost always a little larger than the validation loss...) even without dropout layers or other regularization method. The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
+The model was trained and validated on different data sets to ensure that the model was not overfitting. Although during training the training loss is almost always a little larger than the validation loss even without dropout layers or other regularization method, seemingly indicating there is no overfitting issue, the model trained without the dropout layers perform much more erratic than the model with some dropout layers. I added 4 dropout layers, after layer 5, layer 10, layer 11 and 12, respectively. The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track (both the first and the second tracks).
 
 ####3. Model parameter tuning
 
-The model used an adam optimizer, so the learning rate was not tuned manually.
+The model used an adam optimizer (rmsprop was also tried and worked), so the learning rate was not tuned manually.
 
 ####4. Appropriate training data
 
