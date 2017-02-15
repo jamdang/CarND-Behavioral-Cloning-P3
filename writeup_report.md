@@ -80,7 +80,7 @@ The convolutional layers were designed to perform feature extraction, and the fu
 
 ####2. Attempts to reduce overfitting in the model
 
-The model was trained and validated on different data sets to ensure that the model was not overfitting. Although during training the training loss is almost always a little larger than the validation loss even without dropout layers or other regularization method, seemingly indicating there is no overfitting issue, the model trained without the dropout layers perform much more erratic than the model with some dropout layers. I added 4 dropout layers, after layer 5, layer 10, layer 11 and 12, respectively. The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track (both the first and the second tracks).
+The model was trained and validated on different data sets to ensure that the model was not overfitting. Although during training the training loss is almost always a little larger than the validation loss even without dropout layers or other regularization method, seemingly indicating there is no overfitting issue, the model trained without the dropout layers perform much more erratic than the model with some dropout layers. I added 4 dropout layers, after layer 6, layer 10, layer 11 and 12, respectively. The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track (both the first and the second tracks).
 
 ####3. Model parameter tuning
 
@@ -95,52 +95,26 @@ For details about how I created the training data, please see the next section.
 
 ####1. Solution Design Approach
 
-The overall strategy for deriving a model architecture was to ...
+The model architecture usesd in this project is heavily based on the [Nvidia's CNN for self-driving cars] (http://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf) for obvious reasons: we are dealing with an almost-exactly-the-same problem as they and their network worked. Also their network (convolutional layers + fully-connected layers) makes sense for obvious reasons: we have raw camera images as our input, the features of which convolutional neural networks really excel to extract, that prompts the use of convolutional layers; then from the extracted high-level image features to the final output, i.e., the steering angle, it makes sense to use a fully-connected NN to do the mapping due to the regression nature of the probelm. 
 
-My first step was to use a convolution neural network model similar to the ... I thought this model might be appropriate because ...
+Thus the design of the network itself becomes the easy part of this project: Nvidia's CNN for self-driving cars is employed with some slight modification. I did try to use less layers or add more layers, experiment with different parameters for each layer, but none of these efforts resulted in improved performance, and often resulted in a desfunction model. So I finally decided to stick with the parameters used in Nvidia's CNN.  
 
-In order to gauge how well the model was working, I split my image and steering angle data into a training and validation set. I found that my first model had a low mean squared error on the training set but a high mean squared error on the validation set. This implied that the model was overfitting. 
+In order to gauge how well the model was working, I split my image and steering angle data into a training and validation set. As I mentioned earlier, I never had any overfitting issue that manifested in the larger validation loss than the traning loss, rather, it's almost always the opposite (that is also kind of weird...). This was true when I trained the model with 6000+ samples, 11000+ samples, and 34000+ samples. That said, by adding some dropout layers, the performance of the model could be much better (w/o dropout layers the motion of the vehicle is rather erratic). However, an interesting note: when I first started (using less layers than the final architecture), I added dropout for each layer. I was stuck for a long time since the model output of the steering angle is always very small (never exceeded 0.1), even leaving me wonder if it's because of my model or the simulator is not working right. Finally I took out all the dropout layers and the trained model started to output comparable steering angle to the training output. 
 
-To combat the overfitting, I modified the model so that ...
-
-Then I ... 
-
-The final step was to run the simulator to see how well the car was driving around track one. There were a few spots where the vehicle fell off the track... to improve the driving behavior in these cases, I ....
+I first trained my model using only the sample data set provided in the course resources. But that never resulted in a workable version of the CNN model. Which brings me to my conclusion after finishing this project: that the data used for the model training and the training process is the real key to obtain the final network. I'll detail the training data/process in the next section. 
 
 At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road.
 
 ####2. Final Model Architecture
 
-The final model architecture (model.py lines 18-24) consisted of a convolution neural network with the following layers and layer sizes ...
+For details of the final model architecture (model.py lines 78-138) including the layers used and layer sizes, please refer to the above table in the previous section.
 
-Here is a visualization of the architecture (note: visualizing the architecture is optional according to the project rubric)
-
-![alt text][image1]
 
 ####3. Creation of the Training Set & Training Process
 
-To capture good driving behavior, I first recorded two laps on track one using center lane driving. Here is an example image of center lane driving:
+To capture good driving behavior, I recorded about three or four laps on track one using center lane driving. Since I noticed that in the sample data given in the project resources the car was driven mostly clockwise, so I only did counter-clockwise driving. I have to say I didn't really master the "driving" of the car even with a XBox controller, so in the training data I eventually fed to the model optimizer, the car was sometimes driving kind of close to one side of the road and at one point even off the track (but I then drive it back on the track). But, that's the best I can do... in a limited time. Also I was kind of curiours how good a performance can I get with this kind of training data. 
 
-![alt text][image2]
+So I got another 6000+ data samples (there were 8000+ data samples in the original sample data folder). Now the real key, or trick, of training a CNN to drive a car is how to address the issue of correcting the car when driven off the center as the project tip pointed out. Two methods were recommended, one is to use multiple camera images, the other is record only when the car is driven from the side to the center of the lane. Here I chose the first one (model.py line 40-55) since 1) it's more systematic and it's easier to record the data, you only have to record when you do center lane driving, with the second method, you have to record those times when you only drive from one side to the center and you have to do that many times; 2) with the second method you have to track the proportion of your side-to-center data and keep wondering when it'll be enough to do this, it won't be a problem if you use method 1; 3) with the multiple camera image method, you automatically get triple data samples. After choosing this method, the only problem left is to tune the "correction" steering angle paramter for left or right camera image. 
 
-I then recorded the vehicle recovering from the left side and right sides of the road back to center so that the vehicle would learn to .... These images show what a recovery looks like starting from ... :
+I finally randomly shuffled the data set and put 20% of the data into a validation set. Adam optimizere was employed to train the model. (RMSProp was also tried)
 
-![alt text][image3]
-![alt text][image4]
-![alt text][image5]
-
-Then I repeated this process on track two in order to get more data points.
-
-To augment the data sat, I also flipped images and angles thinking that this would ... For example, here is an image that has then been flipped:
-
-![alt text][image6]
-![alt text][image7]
-
-Etc ....
-
-After the collection process, I had X number of data points. I then preprocessed this data by ...
-
-
-I finally randomly shuffled the data set and put Y% of the data into a validation set. 
-
-I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was Z as evidenced by ... I used an adam optimizer so that manually training the learning rate wasn't necessary.
